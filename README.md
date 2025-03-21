@@ -64,7 +64,7 @@ Kör en SQL-fråga med valfria parametrar och returnerar resultatet.
 - `params`: En tuple med parametrar för parameteriserade frågor (standard är tom).  
 - `return_as_pandas`:  
   - Om `True`, returneras ett **pandas DataFrame**.  
-  - Om `False`, returneras en **lista med ordböcker**, en per rad.
+  - Om `False`, returneras en **lista med dictionaries**, en per rad.
 
 ### `insert(table: str, df: pd.DataFrame, if_exists: str = "append") -> int`
 Infogar ett pandas DataFrame i den angivna SQLite-tabellen.
