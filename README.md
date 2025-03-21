@@ -1,83 +1,83 @@
-# Hantering av Saknade Valutakurser
+# Handling Missing Exchange Rates
 
-## Datan
-Du kommer att arbeta med två tabeller:
+## The Data
+You will be working with two tables:
 
 ### `currency_exchange`
-Denna tabell innehåller valutakurser för olika valutor till SEK (svenska kronor) på specifika datum.
+This table contains exchange rates for various currencies to SEK (Swedish Krona) on specific dates.
 
-| Kolumn                | Typ   | Beskrivning                                |
+| Column                 | Type   | Description                                 |
 |------------------------|--------|---------------------------------------------|
-| `currency_to_sek`     | REAL   | Växelkurs från valutan till SEK             |
-| `date`                | DATE   | Datum för växelkursen                       |
-| `currency`            | TEXT   | Valutakod (t.ex. USD, EUR)                  |
-| `currency_description`| TEXT   | Valutans fullständiga namn                  |
+| `currency_to_sek`      | REAL   | Exchange rate from the currency to SEK      |
+| `date`                 | DATE   | Date of the exchange rate                   |
+| `currency`             | TEXT   | Currency code (e.g., USD, EUR)              |
+| `currency_description` | TEXT   | Full name of the currency                   |
 
 ### `orders`
-Denna tabell innehåller transaktionsdata för beställningar. Beställningar är registrerade i olika valutor men innehåller inte någon växelkurs.
+This table contains transaction data for orders. Orders are recorded in various currencies but do not include any exchange rate.
 
-| Kolumn         | Typ     | Beskrivning                                               |
-|----------------|----------|------------------------------------------------------------|
-| `order_id`     | INTEGER  | Unikt ID för beställningen (Primärnyckel)                 |
-| `paid_date`    | DATE     | Datum då beställningen betalades                          |
-| `order_total`  | REAL     | Totalt belopp för beställningen i ursprungsvalutan       |
-| `site_name`    | TEXT     | Namn på webbplatsen där beställningen gjordes            |
-| `site_country` | TEXT     | Landet för webbplatsen                                   |
-| `currency`     | TEXT     | Valutakod för beställningen (t.ex. USD, EUR)             |
+| Column         | Type     | Description                                               |
+|----------------|----------|-----------------------------------------------------------|
+| `order_id`     | INTEGER  | Unique ID for the order (Primary Key)                    |
+| `paid_date`    | DATE     | Date the order was paid                                  |
+| `order_total`  | REAL     | Total amount of the order in the original currency       |
+| `site_name`    | TEXT     | Name of the website where the order was placed           |
+| `site_country` | TEXT     | Country of the website                                   |
+| `currency`     | TEXT     | Currency code of the order (e.g., USD, EUR)             |
 
-## Uppgiften
-Ditt mål är att matcha varje beställning med rätt växelkurs från `currency_exchange`. Dock saknas vissa datum i växelkurs-tabellen på grund av helgdagar eller bankfria dagar. Om ett datum i `paid_date` inte har någon motsvarande växelkurs, ska du istället använda den senaste tillgängliga växelkursen före det datumet.
+## The Task
+Your goal is to match each order with the correct exchange rate from `currency_exchange`. However, some dates are missing in the exchange rate table due to holidays or non-banking days. If a `paid_date` in the order does not have a corresponding exchange rate, you should instead use the **most recent available rate before that date**.
 
-### Exempelscenario
-**Tillgängliga växelkursdatum:**
+### Example Scenario
+**Available exchange rate dates:**
 
-| Datum        | Växelkurs Tillgänglig? |
-|--------------|-------------------------|
-| 2024-03-01   | ✅ Ja                    |
-| 2024-03-02   | ✅ Ja                    |
-| 2024-03-03   | ✅ Ja                    |
-| 2024-03-04   | ✅ Ja                    |
-| 2024-03-05   | ✅ Ja                    |
-| 2024-03-06   | ✅ Ja                    |
-| 2024-03-07   | ✅ Ja                    |
-| 2024-03-08   | ❌ Nej                   |
-| 2024-03-09   | ❌ Nej                   |
-| 2024-03-10   | ❌ Nej                   |
-| 2024-03-11   | ✅ Ja                    |
-| 2024-03-12   | ✅ Ja                    |
+| Date         | Exchange Rate Available? |
+|--------------|---------------------------|
+| 2024-03-01   | ✅ Yes                     |
+| 2024-03-02   | ✅ Yes                     |
+| 2024-03-03   | ✅ Yes                     |
+| 2024-03-04   | ✅ Yes                     |
+| 2024-03-05   | ✅ Yes                     |
+| 2024-03-06   | ✅ Yes                     |
+| 2024-03-07   | ✅ Yes                     |
+| 2024-03-08   | ❌ No                      |
+| 2024-03-09   | ❌ No                      |
+| 2024-03-10   | ❌ No                      |
+| 2024-03-11   | ✅ Yes                     |
+| 2024-03-12   | ✅ Yes                     |
 
-**Och en beställning med:**
+**And an order with:**
 - `paid_date`: `2024-03-10`
 
-Eftersom det inte finns någon växelkurs registrerad för `2024-03-10`, använder vi den senaste tillgängliga kursen före detta datum, vilket är från `2024-03-07`.
+Since there is no exchange rate recorded for `2024-03-10`, we use the most recent available rate before that date, which is from `2024-03-07`.
 
-## Hur Du Kan Angripa Problemet
-Du kan lösa detta problem på vilket sätt du vill – med SQL, Python eller annat tillvägagångssätt. Det viktigaste är att du kan förklara din tankegång och dina val.
+## How You Can Approach the Problem
+You can solve this problem however you prefer – using SQL, Python, or another approach. The most important thing is that you can explain your thought process and your choices.
 
-## Hjälpfunktioner tillgängliga
-Dessa hjälpfunktioner finns tillgängliga för att förenkla interaktionen med SQLite-databasen (`db.sqlite3`):
+## Helper Functions Available
+These utility functions are available to simplify interaction with the SQLite database (`db.sqlite3`):
 
 ### `select(sql: str, params: tuple = (), return_as_pandas: bool = False)`
-Kör en SQL-fråga med valfria parametrar och returnerar resultatet.
+Executes a SQL query with optional parameters and returns the result.
 
-- `sql`: SQL-frågan som ska köras.  
-- `params`: En tuple med parametrar för parameteriserade frågor (standard är tom).  
+- `sql`: The SQL query to run.  
+- `params`: A tuple of parameters for parameterized queries (default is empty).  
 - `return_as_pandas`:  
-  - Om `True`, returneras ett **pandas DataFrame**.  
-  - Om `False`, returneras en **lista med dictionaries**, en per rad.
+  - If `True`, returns a **pandas DataFrame**.  
+  - If `False`, returns a **list of dictionaries**, one per row.
 
 ### `insert(table: str, df: pd.DataFrame, if_exists: str = "append") -> int`
-Infogar ett pandas DataFrame i den angivna SQLite-tabellen.
+Inserts a pandas DataFrame into the specified SQLite table.
 
-- `table`: Namn på tabellen att infoga i.  
-- `df`: DataFrame som innehåller datan som ska infogas.  
+- `table`: Name of the table to insert into.  
+- `df`: The DataFrame containing the data to be inserted.  
 - `if_exists`:  
-  - `"fail"` – ger fel om tabellen redan finns  
-  - `"replace"` – raderar tabellen innan data infogas  
-  - `"append"` – lägger till data i befintlig tabell (standard)  
-- **Returnerar** antalet rader som infogats.
+  - `"fail"` – raise error if the table already exists  
+  - `"replace"` – drop the table before inserting  
+  - `"append"` – add to existing table (default)  
+- **Returns** the number of rows inserted.
 
-## Några Saker att Tänka På
-- Växelkursen för en beställning ska vara den senast tillgängliga före `paid_date`.
-- Alla beställningars valutor finns i `currency_exchange`, så det kommer alltid finnas en växelkurs tillgänglig.
-- Tabellen `currency_exchange` innehåller alltid datum både före och efter `orders`, så det finns minst en kurs före den tidigaste beställningen.
+## Things to Keep in Mind
+- The exchange rate for an order should be the most recent one available before the `paid_date`.
+- All order currencies exist in `currency_exchange`, so a matching exchange rate will always be available.
+- The `currency_exchange` table always contains dates both before and after the orders, so there's always at least one rate available before the earliest order.
