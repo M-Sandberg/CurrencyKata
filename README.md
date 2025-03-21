@@ -1,7 +1,6 @@
 # Hantering av Saknade Valutakurser
 
 ## Datan
-
 Du kommer att arbeta med två tabeller:
 
 ### `currency_exchange`
@@ -27,11 +26,9 @@ Denna tabell innehåller transaktionsdata för beställningar. Beställningar ä
 | `currency`     | TEXT     | Valutakod för beställningen (t.ex. USD, EUR)             |
 
 ## Uppgiften
-
 Ditt mål är att matcha varje beställning med rätt växelkurs från `currency_exchange`. Dock saknas vissa datum i växelkurs-tabellen på grund av helgdagar eller bankfria dagar. Om ett datum i `paid_date` inte har någon motsvarande växelkurs, ska du istället använda den senaste tillgängliga växelkursen före det datumet.
 
 ### Exempelscenario
-
 **Tillgängliga växelkursdatum:**
 
 | Datum        | Växelkurs Tillgänglig? |
@@ -55,27 +52,32 @@ Ditt mål är att matcha varje beställning med rätt växelkurs från `currency
 Eftersom det inte finns någon växelkurs registrerad för `2024-03-10`, använder vi den senaste tillgängliga kursen före detta datum, vilket är från `2024-03-07`.
 
 ## Hur Du Kan Angripa Problemet
-
 Du kan lösa detta problem på vilket sätt du vill – med SQL, Python eller annat tillvägagångssätt. Det viktigaste är att du kan förklara din tankegång och dina val.
 
-## Tillgängliga Hjälpfunktioner
+## Hjälpfunktioner tillgängliga
+Dessa hjälpfunktioner finns tillgängliga för att förenkla interaktionen med SQLite-databasen (`db.sqlite3`):
 
-Du har några färdiga funktioner att använda i notebooken:
+### `select(sql: str, params: tuple = (), return_as_pandas: bool = False)`
+Kör en SQL-fråga med valfria parametrar och returnerar resultatet.
 
-### `list_select(sql: str) -> list`
-Kör en SQL-fråga och ger dig tillbaka resultatet som en lista med dictionaries – en för varje rad i resultatet.
+- `sql`: SQL-frågan som ska köras.  
+- `params`: En tuple med parametrar för parameteriserade frågor (standard är tom).  
+- `return_as_pandas`:  
+  - Om `True`, returneras ett **pandas DataFrame**.  
+  - Om `False`, returneras en **lista med ordböcker**, en per rad.
 
-### `pd_select(sql: str) -> pd.DataFrame`
-Kör en SQL-fråga och returnerar resultatet som en Pandas DataFrame direkt.
+### `insert(table: str, df: pd.DataFrame, if_exists: str = "append") -> int`
+Infogar ett pandas DataFrame i den angivna SQLite-tabellen.
 
-### `list_insert(table: str, data: list, if_exists: str = "fail") -> int`
-Stoppar in en lista med dictionaries (dvs. rader) i en tabell i databasen. Du kan styra om befintliga rader ska ersättas genom att sätta if_exists till "replace".
-
-### `pd_insert(table: str, df: pd.DataFrame, if_exists: str = "fail") -> int`
-Samma sak som ovan, fast med en hel DataFrame istället för en lista. Du kan styra om befintliga rader ska ersättas genom att sätta if_exists till "replace".
+- `table`: Namn på tabellen att infoga i.  
+- `df`: DataFrame som innehåller datan som ska infogas.  
+- `if_exists`:  
+  - `"fail"` – ger fel om tabellen redan finns  
+  - `"replace"` – raderar tabellen innan data infogas  
+  - `"append"` – lägger till data i befintlig tabell (standard)  
+- **Returnerar** antalet rader som infogats.
 
 ## Några Saker att Tänka På
-
 - Växelkursen för en beställning ska vara den senast tillgängliga före `paid_date`.
 - Alla beställningars valutor finns i `currency_exchange`, så det kommer alltid finnas en växelkurs tillgänglig.
 - Tabellen `currency_exchange` innehåller alltid datum både före och efter `orders`, så det finns minst en kurs före den tidigaste beställningen.
